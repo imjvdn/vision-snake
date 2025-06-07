@@ -1,0 +1,2 @@
+[console_scripts]
+vision-snake = vision_snake.cli:main
