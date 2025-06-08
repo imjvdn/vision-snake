@@ -98,7 +98,7 @@ conda activate vision-snake
 
 ```bash
 # Clone the repository with depth 1 for faster download
-git clone --depth 1 https://github.com/yourusername/vision-snake.git
+git clone --depth 1 https://github.com/imjvdn/vision-snake.git
 cd vision-snake
 
 # Install in development mode with all dependencies
@@ -109,7 +109,7 @@ pip install -e .
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/vision-snake.git
+git clone https://github.com/imjvdn/vision-snake.git
 cd vision-snake
 
 # Install runtime dependencies only
@@ -214,9 +214,16 @@ Start-Process -FilePath "python" -ArgumentList "-m vision_snake" -WindowStyle No
    - Self-collision only checked after minimum snake length (6 segments)
 
 4. **Game State Management**:
+   - Menu: Start screen with options for Start Game, Settings, and Exit
+     - Navigate with index finger pointing or keyboard arrow keys
+     - Select an option by holding your finger on it or pressing Enter
+   - Playing: Active gameplay state
+     - Control snake with index finger position
+     - Pause by pressing 'p' key
+     - Return to menu from pause by pressing 'm' key
    - Game Over: Triggered by self-collision
    - Reset: Show open palm gesture (all 5 fingers extended) for 2 seconds
-   - Exit: Press 'q' or ESC key
+   - Exit: Press 'q' or ESC key from any state
 
 ## Development Documentation
 
