@@ -21,7 +21,7 @@ The Vision Snake game implements a modular architecture with clear separation of
   - Danger zone highlighting around snake body segments with semi-transparent overlays
   - Enhanced snake head visibility with contrasting outlines
   - Score-based snake color progression
-- **Game State Management**: Comprehensive state tracking for game progression, scoring, and reset functionality
+- **Game State Management**: Comprehensive state management system with menu, playing, and pause states
 - **Gesture Recognition**: Open palm detection for game reset using MediaPipe hand landmark configuration
 - **Performance Optimization**: Frame rate management (~30 FPS) with adaptive update intervals based on score
 
@@ -36,11 +36,13 @@ vision-snake/
 │   │   ├── cli.py         # Command-line interface
 │   │   ├── game.py        # Main game class
 │   │   ├── hand_tracker.py # Hand tracking module
+│   │   ├── state_manager.py # Game state management
 │   │   └── snake_game.py  # Snake game logic
 │   └── main.py            # Direct script entry point
 ├── tests/                 # Test files
 │   ├── __init__.py
-│   └── test_snake_game.py # Unit tests for snake game
+│   ├── test_snake_game.py # Unit tests for snake game
+│   └── test_state_manager.py # Unit tests for state manager
 ├── README.md              # This file
 ├── requirements.txt       # Dependencies
 └── setup.py               # Package installation setup
@@ -224,8 +226,9 @@ The application follows a modular design pattern with these key components:
 
 1. **HandTracker** (`hand_tracker.py`): Encapsulates MediaPipe hand detection
 2. **SnakeGame** (`snake_game.py`): Core game logic and rendering
-3. **VisionSnakeGame** (`game.py`): Integration layer connecting hand tracking to game
-4. **CLI** (`cli.py`): Command-line interface and argument parsing
+3. **StateManager** (`state_manager.py`): Game state management system with menu, playing, and pause states
+4. **VisionSnakeGame** (`game.py`): Integration layer connecting hand tracking to game
+5. **CLI** (`cli.py`): Command-line interface and argument parsing
 
 ### Testing Framework
 
@@ -260,6 +263,13 @@ The `SnakeGame` class:
 - Dynamically adjusts game speed based on score progression
 - Renders enhanced visual elements with OpenCV drawing primitives
 - Manages state transitions between gameplay, game over, and reset states
+
+### vision_snake.state_manager
+
+The `StateManager` class:
+- Manages game states (menu, playing, pause) with transitions
+- Handles user input for state changes
+- Integrates with `SnakeGame` for gameplay state management
 
 ### vision_snake.game
 
@@ -323,7 +333,9 @@ The `CLI` module:
    - Power-up system with temporary special abilities
    - Progressive difficulty scaling
 
-3. **User Experience**
+3. **User Experience** ✅
+   - ✅ Menu system with state transitions (Implemented)
+   - ✅ Pause functionality with menu return option (Implemented)
    - Configurable visual themes and color schemes
    - Sound effects and background music
    - User profiles and high score persistence

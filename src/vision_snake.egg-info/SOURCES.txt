@@ -5,6 +5,7 @@ src/vision_snake/cli.py
 src/vision_snake/game.py
 src/vision_snake/hand_tracker.py
 src/vision_snake/snake_game.py
+src/vision_snake/state_manager.py
 src/vision_snake.egg-info/PKG-INFO
 src/vision_snake.egg-info/SOURCES.txt
 src/vision_snake.egg-info/dependency_links.txt
@@ -12,3 +13,4 @@ src/vision_snake.egg-info/entry_points.txt
 src/vision_snake.egg-info/requires.txt
 src/vision_snake.egg-info/top_level.txt
 tests/test_snake_game.py
+tests/test_state_manager.py

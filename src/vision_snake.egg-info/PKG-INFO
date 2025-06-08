@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: vision_snake
 Version: 0.1.0
 Summary: A Snake game controlled by hand gestures via webcam
@@ -10,3 +10,8 @@ Requires-Python: >=3.7
 Requires-Dist: opencv-python>=4.5.0
 Requires-Dist: mediapipe>=0.8.9
 Requires-Dist: numpy>=1.19.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

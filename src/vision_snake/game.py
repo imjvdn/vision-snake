@@ -4,6 +4,7 @@ import time
 import mediapipe as mp
 from vision_snake.hand_tracker import HandTracker
 from vision_snake.snake_game import SnakeGame
+from vision_snake.state_manager import StateManager, MenuState, PlayingState
 
 class VisionSnakeGame:
     """
@@ -48,12 +49,15 @@ class VisionSnakeGame:
         # Initialize hand tracker
         self.hand_tracker = HandTracker(detection_confidence=0.7, tracking_confidence=0.5)
         
-        # Initialize snake game with webcam dimensions
-        self.game = SnakeGame(game_width=self.frame_width, game_height=self.frame_height)
+        # Initialize state manager with webcam dimensions
+        self.state_manager = StateManager(game_width=self.frame_width, game_height=self.frame_height)
         
-        # Variables for reset gesture detection
-        self.palm_shown_start_time = None
-        self.palm_duration_required = 2.0  # seconds to hold palm for reset
+        # Add states
+        self.state_manager.add_state("menu", MenuState)
+        self.state_manager.add_state("playing", PlayingState)
+        
+        # Start with the menu state
+        self.state_manager.change_state("menu")
         
         # FPS calculation variables
         self.prev_time = 0
@@ -75,64 +79,30 @@ class VisionSnakeGame:
         # Get index finger position
         finger_pos, frame = self.hand_tracker.get_index_finger_position(frame, results, draw=True)
         
-        # Check for reset gesture (open palm) when game is over
-        if self.game.game_over and results.multi_hand_landmarks:
-            self._check_reset_gesture(frame, results)
+        # Update the current state
+        hand_landmarks = results.multi_hand_landmarks[0] if results.multi_hand_landmarks else None
+        self.state_manager.update(hand_landmarks, finger_pos)
         
-        # Update and draw the game
-        if finger_pos:
-            self.game.update(finger_pos)
-        frame = self.game.draw(frame)
+        # Render the current state
+        frame = self.state_manager.render(frame)
         
-        # Calculate and display FPS
+        # Calculate FPS
         self.curr_time = time.time()
         fps = 1 / (self.curr_time - self.prev_time) if self.prev_time > 0 else 0
         self.prev_time = self.curr_time
         
-        cv2.putText(frame, f"FPS: {int(fps)}", (self.frame_width - 120, 30), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-        
         return frame
     
-    def _check_reset_gesture(self, frame, results):
-        """Check for open palm reset gesture"""
-        # Get all finger landmarks
-        hand_landmarks = results.multi_hand_landmarks[0].landmark
-        
-        # Check if all fingers are extended (simple open palm detection)
-        # MediaPipe hand landmarks: thumb tip (4), index tip (8), middle tip (12), 
-        # ring tip (16), pinky tip (20), wrist (0)
-        finger_tips = [4, 8, 12, 16, 20]
-        wrist_y = hand_landmarks[0].y
-        
-        # Count extended fingers (fingers whose tips are higher than the wrist)
-        extended_fingers = sum(1 for tip_idx in finger_tips 
-                             if hand_landmarks[tip_idx].y < wrist_y)
-        
-        # If all fingers are extended (open palm)
-        if extended_fingers >= 4:
-            if self.palm_shown_start_time is None:
-                self.palm_shown_start_time = time.time()
-            elif time.time() - self.palm_shown_start_time > self.palm_duration_required:
-                # Reset the game
-                self.game.reset()
-                self.palm_shown_start_time = None
-            
-            # Draw a progress bar for reset gesture
-            elapsed = time.time() - self.palm_shown_start_time if self.palm_shown_start_time else 0
-            progress = min(elapsed / self.palm_duration_required, 1.0)
-            bar_width = int(200 * progress)
-            cv2.rectangle(frame, (self.frame_width//2-100, self.frame_height//2+120), 
-                         (self.frame_width//2-100+bar_width, self.frame_height//2+140), 
-                         (0, 255, 0), cv2.FILLED)
-            cv2.rectangle(frame, (self.frame_width//2-100, self.frame_height//2+120), 
-                         (self.frame_width//2+100, self.frame_height//2+140), 
-                         (255, 255, 255), 2)
-        else:
-            self.palm_shown_start_time = None
+    # The reset gesture detection is now handled in the PlayingState class
     
     def run(self):
         """Run the main game loop"""
+        print("Starting Vision Snake Game...")
+        print("Use your index finger to control the snake.")
+        print("Show an open palm for 2 seconds to restart after game over.")
+        print("Press 'p' to pause, 'm' to return to menu when paused.")
+        print("Press 'q' or ESC to quit.")
+        
         while True:
             frame = self.process_frame()
             if frame is None:
@@ -142,9 +112,9 @@ class VisionSnakeGame:
             # Display the frame
             cv2.imshow("Vision Snake Game", frame)
             
-            # Check for exit key (ESC or 'q')
+            # Check for key presses
             key = cv2.waitKey(1)
-            if key == 27 or key == ord('q'):
+            if not self.state_manager.handle_key(key):
                 break
         
         # Clean up
