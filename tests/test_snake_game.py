@@ -67,21 +67,25 @@ class TestSnakeGame(unittest.TestCase):
     
     def test_collision_with_self(self):
         """Test that collision with self ends the game"""
-        # Create a snake with enough segments
+        # Setup a snake with multiple body segments
         self.game.snake_body = [(100, 100), (110, 100), (120, 100), 
                                (130, 100), (140, 100), (150, 100)]
+        self.game.max_length = 10  # Ensure the snake body doesn't get truncated
         
         # Make sure the snake is long enough for collision detection
         self.assertGreater(len(self.game.snake_body), 5)
         
+        # Ensure force_update is True by setting last_update_time far in the past
+        self.game.last_update_time = 0
+        
         # Force a collision by adding a new head position that matches an existing body segment
         result = self.game.update((100, 100))
         
-        # The update should return False when game over
-        self.assertFalse(result)
-        
-        # Check that game is over
+        # The game_over flag should be set to True
         self.assertTrue(self.game.game_over)
+        
+        # The update should return False when game is over
+        self.assertFalse(result)
 
 if __name__ == '__main__':
     unittest.main()
